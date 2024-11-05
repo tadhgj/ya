@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
+require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
 app.use(cors()); // Enable CORS
@@ -9,7 +10,7 @@ app.use(cors()); // Enable CORS
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000", // Allow requests from this origin
+    origin: process.env.CLIENT_URL || "http://localhost:3000", // Allow requests from this origin
     methods: ["GET", "POST"]
   }
 });
@@ -39,5 +40,5 @@ io.on('connection', (socket) => {
   });
 });
 
-const port = 3001;
+const port = process.env.PORT || 3001;
 server.listen(port, () => console.log(`Listening on port ${port}`));

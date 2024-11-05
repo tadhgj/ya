@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import socketIOClient from 'socket.io-client';
 
-const socket = socketIOClient('http://localhost:3001'); // Ensure this matches your server URL
+const socket = socketIOClient(process.env.REACT_APP_SOCKET_URL); // Use environment variable
 
 const Counter = () => {
   const [count, setCount] = useState(0);
