@@ -1,37 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import socketIOClient from 'socket.io-client';
 
-const socket = socketIOClient(process.env.REACT_APP_SOCKET_URL); // Use environment variable
-
 const Counter = () => {
   const [count, setCount] = useState(0);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    // Listen for updates from the server
-    socket.on('updateCount', (newCount) => {
+    const newSocket = socketIOClient(process.env.REACT_APP_SOCKET_URL, {
+      transports: ['websocket'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    setSocket(newSocket);
+
+    newSocket.on('updateCount', (newCount) => {
       setCount(newCount);
     });
 
     return () => {
-      // Clean up the socket connection on unmount
-      socket.off('updateCount'); // Remove the specific event listener
-      socket.disconnect();
+      newSocket.off('updateCount');
+      newSocket.disconnect();
     };
   }, []);
 
   const increment = () => {
-    socket.emit('increment');
-  };
-
-  const decrement = () => {
-    socket.emit('decrement');
+    if (socket) {
+      socket.emit('increment');
+    }
   };
 
   return (
     <div>
       <h2>Count: {count}</h2>
       <button onClick={increment}>+</button>
-      {/* <button onClick={decrement}>-</button> */}
     </div>
   );
 };
